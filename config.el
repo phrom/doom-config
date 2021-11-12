@@ -35,10 +35,22 @@
 (setq org-directory "~/org/")
 (setq org-roam-directory org-directory)
 
+(after! browse-url
+  (defun browse-url-msedge (url &optional _new-window)
+    "Ask the Microsoft Edge browser to load URL.
+Default to the URL around or before point.
+The optional argument NEW-WINDOW is not used."
+    (interactive (browse-url-interactive-arg "URL: "))
+    (setq url (browse-url-encode-url url))
+    (call-process browse-url-msedge-program nil nil nil url))
+
+  (setq browse-url-msedge-program "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe")
+
+  (setq browse-url-browser-function #'browse-url-msedge))
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
-
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
