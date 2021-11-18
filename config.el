@@ -76,6 +76,8 @@ The optional argument NEW-WINDOW is not used."
   (setq org-agenda-start-day nil)
   (setq org-agenda-dim-blocked-tasks 'invisible)
   (setq org-element-use-cache nil)
+  (setq org-log-done t)
+  (setq org-log-into-drawer t)
   (add-to-list 'org-modules 'org-habit)
   (add-to-list 'org-modules 'org-id)
   (use-package! org-edna)
@@ -89,7 +91,6 @@ The optional argument NEW-WINDOW is not used."
   (setq skk-tut-file "./.emacs.d/.local/straight/repos/ddskk/etc/SKK.tut"))
 
 (use-package! vulpea)
-
 
 (setq org-agenda-prefix-format
       '((agenda . " %i %(vulpea-agenda-category 16) %?-16t% s")
@@ -136,7 +137,7 @@ Refer to `org-agenda-prefix-format' for more information."
 (after! org
   (add-to-list 'org-tags-exclude-from-inheritance "include-in-agenda"))
 
-(defun vulpea-project-p ()
+(defun phr/org-roam-has-todo-p ()
   "Return non-nil if current buffer has any todo entry.
 
 TODO entries marked as done are ignored, meaning the this
@@ -150,20 +151,37 @@ tasks."
            'todo))
      nil 'first-match))                     ; (3)
 
-(add-hook 'find-file-hook #'vulpea-project-update-tag)
-(add-hook 'before-save-hook #'vulpea-project-update-tag)
+(defvar phr/org-roam-taggers (list))
 
-(defun vulpea-project-update-tag ()
+(defun phr/org-roam-tag-include-in-agenda (tags)
+  (if (phr/org-roam-has-todo-p)
+      (cons "include-in-agenda" tags)
+    (remove "include-in-agenda" tags)))
+
+(add-to-list 'phr/org-roam-taggers #'phr/org-roam-tag-include-in-agenda)
+
+(defun phr/org-roam-tag-by-directory (tags)
+  (append tags (butlast (f-split (file-relative-name (buffer-file-name) org-roam-directory)))))
+
+(add-to-list 'phr/org-roam-taggers #'phr/org-roam-tag-by-directory)
+
+(defun phr/org-roam-note-p ()
+  "Return non-nil if the currently visited buffer is a note."
+  (and buffer-file-name
+       (string-prefix-p
+        (expand-file-name (file-name-as-directory org-roam-directory))
+        (file-name-directory buffer-file-name))))
+
+(defun phr/org-roam-update-filetags ()
       "Update PROJECT tag in the current buffer."
       (when (and (not (active-minibuffer-window))
-                 (vulpea-buffer-p))
+                 (phr/org-roam-note-p))
         (save-excursion
           (goto-char (point-min))
           (let* ((tags (vulpea-buffer-tags-get))
                  (original-tags tags))
-            (if (vulpea-project-p)
-                (setq tags (cons "include-in-agenda" tags))
-              (setq tags (remove "include-in-agenda" tags)))
+            (dolist (tagger phr/org-roam-taggers)
+              (setq tags (funcall tagger tags)))
 
             ;; cleanup duplicates
             (setq tags (seq-uniq tags))
@@ -173,12 +191,8 @@ tasks."
                       (seq-difference original-tags tags))
               (apply #'vulpea-buffer-tags-set tags))))))
 
-(defun vulpea-buffer-p ()
-  "Return non-nil if the currently visited buffer is a note."
-  (and buffer-file-name
-       (string-prefix-p
-        (expand-file-name (file-name-as-directory org-roam-directory))
-        (file-name-directory buffer-file-name))))
+(add-hook 'find-file-hook #'phr/org-roam-update-filetags)
+(add-hook 'before-save-hook #'phr/org-roam-update-filetags)
 
 (defun vulpea-project-files ()
   "Return a list of note files containing 'project' tag." ;
@@ -197,3 +211,19 @@ tasks."
   (setq org-agenda-files (vulpea-project-files)))
 
 (advice-add 'org-agenda :before #'vulpea-agenda-files-update)
+
+(defun phr/org-roam-tagger-update-all-files ()
+  (interactive)
+  (dolist (file (org-roam-list-files))
+  (message "processing %s" file)
+  (with-current-buffer (or (find-buffer-visiting file)
+                           (find-file-noselect file))
+    (phr/org-roam-update-filetags)
+    (save-buffer))))
+
+(defun phr/org-roam-get-first-image (filename) filename)
+
+(defun phr/image-dired-create-thumb-for-org-file (args)
+  (cons (phr/org-roam-get-first-image (car args)) (cdr args)))
+
+(advice-add 'image-dired-create-thumb-1 :filter-args #'phr/image-dired-create-thumb-for-org-file)
