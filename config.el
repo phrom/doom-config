@@ -29,11 +29,19 @@
 
 (setq doom-font "Noto Mono-12")
 (setq doom-variable-pitch-font "Noto Sans CJK JP-12")
+(+global-word-wrap-mode +1)
+
+(defun phr/wsl-call-process (command &rest parameters)
+  (call-process "/mnt/c/Users/Pedro Romano/CLionProjects/fork/cmake-build-debug/fork.exe"
+                nil nil nil
+                command
+                (string-join parameters " ")))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
 (setq org-roam-directory org-directory)
+(setq deft-directory org-directory)
 
 (after! browse-url
   (defun browse-url-msedge (url &optional _new-window)
@@ -42,11 +50,16 @@ Default to the URL around or before point.
 The optional argument NEW-WINDOW is not used."
     (interactive (browse-url-interactive-arg "URL: "))
     (setq url (browse-url-encode-url url))
-    (call-process browse-url-msedge-program nil nil nil url))
+    (phr/wsl-call-process browse-url-msedge-program url))
 
-  (setq browse-url-msedge-program "/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe")
+  (setq browse-url-msedge-program "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe")
 
   (setq browse-url-browser-function #'browse-url-msedge))
+
+(setq playnite-program "C:\\Users\\Pedro Romano\\AppData\\Local\\Playnite\\Playnite.DesktopApp.exe")
+
+(defun phr/org-playnite-start (id)
+  (phr/wsl-call-process playnite-program "--start" id))
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -78,6 +91,8 @@ The optional argument NEW-WINDOW is not used."
   (setq org-element-use-cache nil)
   (setq org-log-done t)
   (setq org-log-into-drawer t)
+  (org-link-set-parameters "playnite" :follow #'phr/org-playnite-start)
+  (org-link-set-parameters "exe" :follow #'phr/wsl-call-process)
   (add-to-list 'org-modules 'org-habit)
   (add-to-list 'org-modules 'org-id)
   (use-package! org-edna)
