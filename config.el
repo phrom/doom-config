@@ -242,3 +242,12 @@ tasks."
   (cons (phr/org-roam-get-first-image (car args)) (cdr args)))
 
 (advice-add 'image-dired-create-thumb-1 :filter-args #'phr/image-dired-create-thumb-for-org-file)
+
+(defun phr/org-roam-toggle-buffer (&rest _)
+  (cond
+   ((and (eq (org-roam-buffer--visibility) 'visible) (not (phr/org-roam-note-p)))
+    (org-roam-buffer-toggle))
+   ((and (not (eq (org-roam-buffer--visibility) 'visible)) (phr/org-roam-note-p))
+    (org-roam-buffer-toggle))))
+
+(advice-add 'switch-to-buffer :after #'phr/org-roam-toggle-buffer)
