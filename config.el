@@ -61,6 +61,11 @@ The optional argument NEW-WINDOW is not used."
 (defun phr/org-playnite-start (id)
   (phr/wsl-call-process playnite-program "--start" id))
 
+(setq vlc-program "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe")
+
+(defun phr/vlc-open-file (filename)
+  (phr/wsl-call-process vlc-program filename))
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
@@ -91,8 +96,14 @@ The optional argument NEW-WINDOW is not used."
   (setq org-element-use-cache nil)
   (setq org-log-done t)
   (setq org-log-into-drawer t)
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t
+           :immediate-finish t)))
   (org-link-set-parameters "playnite" :follow #'phr/org-playnite-start)
   (org-link-set-parameters "exe" :follow #'phr/wsl-call-process)
+  (org-link-set-parameters "vlc" :follow #'phr/vlc-open-file)
   (add-to-list 'org-modules 'org-habit)
   (add-to-list 'org-modules 'org-id)
   (use-package! org-edna)
