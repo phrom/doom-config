@@ -87,6 +87,11 @@ The optional argument NEW-WINDOW is not used."
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+(defun phr/org-roam-capture-move-point ()
+  (org-up-heading-safe)
+  (forward-word)
+  (backward-word))
+
 (after! org
   (setq org-startup-with-inline-images t)
   (setq org-attach-auto-tag nil)
@@ -98,9 +103,10 @@ The optional argument NEW-WINDOW is not used."
   (setq org-log-into-drawer t)
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :target
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "* ${title}\n")
            :unnarrowed t
            :immediate-finish t)))
+  (advice-add 'org-roam-node-find :after #'phr/org-roam-capture-move-point)
   (org-link-set-parameters "playnite" :follow #'phr/org-playnite-start)
   (org-link-set-parameters "exe" :follow #'phr/wsl-call-process)
   (org-link-set-parameters "vlc" :follow #'phr/vlc-open-file)
