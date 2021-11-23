@@ -166,37 +166,6 @@ Refer to `org-agenda-prefix-format' for more information."
         (s-truncate len (s-pad-right len " " result))
       result)))
 
-(after! org
-  (add-to-list 'org-tags-exclude-from-inheritance "include-in-agenda"))
-
-(defun phr/org-roam-has-todo-p ()
-  "Return non-nil if current buffer has any todo entry.
-
-TODO entries marked as done are ignored, meaning the this
-function returns nil if current buffer contains only completed
-tasks."
-  (org-element-map                          ; (2)
-       (org-element-parse-buffer 'headline) ; (1)
-       'headline
-     (lambda (h)
-       (eq (org-element-property :todo-type h)
-           'todo))
-     nil 'first-match))                     ; (3)
-
-(defvar phr/org-roam-taggers (list))
-
-(defun phr/org-roam-tag-include-in-agenda (tags)
-  (if (phr/org-roam-has-todo-p)
-      (cons "include-in-agenda" tags)
-    (remove "include-in-agenda" tags)))
-
-(add-to-list 'phr/org-roam-taggers #'phr/org-roam-tag-include-in-agenda)
-
-(defun phr/org-roam-tag-by-directory (tags)
-  (append tags (butlast (f-split (file-relative-name (buffer-file-name) org-roam-directory)))))
-
-(add-to-list 'phr/org-roam-taggers #'phr/org-roam-tag-by-directory)
-
 (defun phr/org-roam-note-p ()
   "Return non-nil if the currently visited buffer is a note."
   (and buffer-file-name
@@ -204,54 +173,21 @@ tasks."
         (expand-file-name (file-name-as-directory org-roam-directory))
         (file-name-directory buffer-file-name))))
 
-(defun phr/org-roam-update-filetags ()
-      "Update PROJECT tag in the current buffer."
-      (when (and (not (active-minibuffer-window))
-                 (phr/org-roam-note-p))
-        (save-excursion
-          (goto-char (point-min))
-          (let* ((tags (vulpea-buffer-tags-get))
-                 (original-tags tags))
-            (dolist (tagger phr/org-roam-taggers)
-              (setq tags (funcall tagger tags)))
+(defun phr/org-roam-project-files ()
+  "Return a list of note files containing 'project' tag."
+  (seq-map
+   #'car
+   (org-roam-db-query
+    [:select :distinct [nodes:file]
+     :from nodes
+     :join files :on (= nodes:file files:file)
+     :where (not (is todo))])))
 
-            ;; cleanup duplicates
-            (setq tags (seq-uniq tags))
-
-            ;; update tags if changed
-            (when (or (seq-difference tags original-tags)
-                      (seq-difference original-tags tags))
-              (apply #'vulpea-buffer-tags-set tags))))))
-
-(add-hook 'find-file-hook #'phr/org-roam-update-filetags)
-(add-hook 'before-save-hook #'phr/org-roam-update-filetags)
-
-(defun vulpea-project-files ()
-  "Return a list of note files containing 'project' tag." ;
-  (seq-uniq
-   (seq-map
-    #'car
-    (org-roam-db-query
-     [:select [nodes:file]
-      :from tags
-      :left-join nodes
-      :on (= tags:node-id nodes:id)
-      :where (like tag (quote "%\"include-in-agenda\"%"))]))))
-
-(defun vulpea-agenda-files-update (&rest _)
+(defun phr/org-agenda-files-update (&rest _)
   "Update the value of `org-agenda-files'."
-  (setq org-agenda-files (vulpea-project-files)))
+  (setq org-agenda-files (phr/org-roam-project-files)))
 
-(advice-add 'org-agenda :before #'vulpea-agenda-files-update)
-
-(defun phr/org-roam-tagger-update-all-files ()
-  (interactive)
-  (dolist (file (org-roam-list-files))
-  (message "processing %s" file)
-  (with-current-buffer (or (find-buffer-visiting file)
-                           (find-file-noselect file))
-    (phr/org-roam-update-filetags)
-    (save-buffer))))
+(advice-add 'org-agenda :before #'phr/org-agenda-files-update)
 
 (defun phr/org-roam-get-first-image (filename) filename)
 
