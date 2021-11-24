@@ -204,3 +204,20 @@ Refer to `org-agenda-prefix-format' for more information."
     (org-roam-buffer-toggle))))
 
 (advice-add 'switch-to-buffer :after #'phr/org-roam-toggle-buffer)
+
+(after! elfeed
+  (setq elfeed-search-filter "+unread")
+
+  (defun phr/elfeed-save-after-every-update (_url)
+    (elfeed-db-save-safe))
+
+  (add-hook 'elfeed-update-hooks #'phr/elfeed-save-after-every-update)
+
+  (defun phr/elfeed-update-helper (feeds)
+    (when feeds
+      (elfeed-update-feed (car feeds))
+      (run-at-time 2 0 #'phr/elfeed-update-helper (cdr feeds))))
+
+  (defun phr/elfeed-update ()
+    (interactive)
+    (phr/elfeed-update-helper (elfeed--shuffle (elfeed-feed-list)))))
