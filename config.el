@@ -207,6 +207,16 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (advice-add 'switch-to-buffer :after #'phr/org-roam-toggle-buffer)
 
+(defun phr/org-sort-entries ()
+  (interactive)
+  (org-sort-entries nil ?a)
+  (org-sort-entries nil ?o))
+
+(defun phr/clean-history ()
+  (interactive)
+  (recentf-cleanup)
+  (clean-buffer-list))
+
 (after! elfeed
   (setq elfeed-search-filter "+unread")
 
