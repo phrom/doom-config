@@ -51,3 +51,4 @@
 
 (package! vulpea)
 (package! org-edna)
+(disable-packages! elfeed-goodies)
