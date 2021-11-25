@@ -106,6 +106,9 @@ The optional argument NEW-WINDOW is not used."
            (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "* ${title}\n")
            :unnarrowed t
            :immediate-finish t)))
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default" entry "%?" :target
+          (file+head "%<%Y-%m-%d>.org" "* %<%Y-%m-%d>\n"))))
   (advice-add 'org-roam-node-find :after #'phr/org-roam-capture-move-point)
   (org-link-set-parameters "playnite" :follow #'phr/org-playnite-start)
   (org-link-set-parameters "exe" :follow #'phr/wsl-call-process)
