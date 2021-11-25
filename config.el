@@ -99,8 +99,7 @@ The optional argument NEW-WINDOW is not used."
   (setq org-agenda-start-day nil)
   (setq org-agenda-dim-blocked-tasks 'invisible)
   (setq org-element-use-cache nil)
-  (setq org-log-done t)
-  (setq org-log-into-drawer t)
+  (setq org-todo-keywords '((sequence "TODO(t)" "|" "DONE(d!)")))
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :target
            (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "* ${title}\n")
