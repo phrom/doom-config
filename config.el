@@ -118,6 +118,8 @@ The optional argument NEW-WINDOW is not used."
   (org-edna-mode))
 
 (after! evil-org
+  (define-key evil-org-mode-map (kbd "<normal-state> RET") nil)
+  (define-key evil-org-mode-map (kbd "<normal-state> <return>") nil)
   (remove-hook 'org-tab-first-hook #'+org-cycle-only-current-subtree-h))
 
 (after! ddskk
@@ -187,6 +189,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 (defun phr/org-agenda-files-update (&rest _)
   "Update the value of `org-agenda-files'."
+  (interactive)
   (setq org-agenda-files (phr/org-roam-project-files)))
 
 (advice-add 'org-agenda :before #'phr/org-agenda-files-update)
@@ -233,3 +236,17 @@ Refer to `org-agenda-prefix-format' for more information."
   (defun phr/elfeed-update ()
     (interactive)
     (phr/elfeed-update-helper (elfeed--shuffle (elfeed-feed-list)))))
+
+(setq phr/org-attach-dir-from-filename t)
+
+(defun phr/org-attach-dir-advice (oldfun &rest args)
+  (if phr/org-attach-dir-from-filename
+      (let* ((file-name (file-name-base (buffer-file-name)))
+             (hashed-name (md5 file-name)))
+        (file-name-concat org-attach-id-dir
+                          (substring hashed-name 0 2)
+                          (substring hashed-name 2)
+                          file-name))
+    (apply oldfun args)))
+
+(advice-add 'org-attach-dir :around #'phr/org-attach-dir-advice)
