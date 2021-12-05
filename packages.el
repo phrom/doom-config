@@ -49,6 +49,12 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! vulpea)
 (package! org-edna)
+(package! elfeed-score)
 (disable-packages! elfeed-goodies)
+(package! org-super-agenda)
+(package! el-patch)
+(package! org-fc :recipe '(:type git :repo "https://git.sr.ht/~l3kn/org-fc" :files (:defaults "awk" "demo.org")))
+(package! persistent-scratch)
+(package! pinentry)
+(package! nyan-mode)
