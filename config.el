@@ -149,7 +149,12 @@
         (org-todo 1)
         (org-schedule nil (concat (format-time-string "%Y-%m-%d " date) reset)))))
 
-  (add-hook 'org-after-todo-state-change-hook #'phr/org-handle-reset-property))
+  (add-hook 'org-after-todo-state-change-hook #'phr/org-handle-reset-property)
+
+  (defun phr/org-autosave ()
+    (run-at-time nil 60 #'org-save-all-org-buffers))
+
+  (phr/org-autosave))
 
 (after! org-attach
   (setq org-attach-auto-tag nil)
@@ -783,3 +788,4 @@ The optional argument NEW-WINDOW is not used."
   (defun ahk-run-script ()
     (interactive)
     (phr/wsl-call-process (buffer-file-name))))
+
