@@ -59,3 +59,4 @@
 (package! pinentry)
 (package! nyan-mode)
 (package! vertico-posframe)
+(package! epkg)

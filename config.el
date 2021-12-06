@@ -762,3 +762,7 @@ The optional argument NEW-WINDOW is not used."
        :desc "Update a single feed" "U" #'elfeed-update-feed
        :desc "Save database" "s" #'phr/elfeed-save-after-update
        :desc "Compact database" "c" #'elfeed-db-compact))
+
+(use-package! epkg
+  :config
+  (setq epkg-repository (expand-file-name "epkg" doom-etc-dir)))
