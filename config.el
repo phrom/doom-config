@@ -744,3 +744,11 @@ The optional argument NEW-WINDOW is not used."
         '((left-fringe . 8)
           (right-fringe . 8)))
   (vertico-posframe-mode 1))
+
+(map! :leader
+      (:prefix ("e" . "elfeed")
+       :desc "Open elfeed" "e" #'elfeed
+       :desc "Update all feeds" "u" #'phr/elfeed-update
+       :desc "Update a single feed" "U" #'elfeed-update-feed
+       :desc "Save database" "s" #'phr/elfeed-save-after-update
+       :desc "Compact database" "c" #'elfeed-db-compact))
