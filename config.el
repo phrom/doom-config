@@ -364,12 +364,18 @@ to t."
   :config
   (setq org-super-agenda-header-map nil)
   (setq org-super-agenda-groups
-        '((:name "Deadline" :and (:deadline t :not (:log closed) :not (:log clocked)) :order 1)
+        '((:name "Deadline" :and (:deadline t
+                                  :todo "TODO"
+                                  :not (:time-grid t)
+                                  :not (:log closed)
+                                  :not (:log clocked))
+           :order 1)
           (:name "Special" :category ("holiday" "birthday") :order 1)
-          (:name "Habits Done" :log state :order 8)
-          (:name "Tasks Finished" :log closed :order 9)
+          (:name "Tasks Finished" :todo "DONE" :log closed :order 9)
+          (:name "Habits Done" :and (:habit t :log state) :order 8)
+          (:discard (:log state))
           (:name "Time Log" :log clocked :order 10)
-          (:name "Habits" :and (:habit t :not (:time-grid)) :order 4)
+          (:name "Habits" :and (:habit t :not (:time-grid t)) :order 4)
           (:name "Overdue Tasks" :and (:todo t :scheduled past :not (:habit t)) :order 2)
           (:name "Scheduled" :time-grid t :order 5)
           (:name "Unscheduled for Today" :todo t :order 3)
