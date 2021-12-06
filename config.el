@@ -168,9 +168,18 @@
   (org-link-set-parameters "vlc" :follow #'phr/vlc-open-file)
   (org-link-set-parameters "steam" :follow #'phr/steam-start))
 
+(cl-defmethod org-roam-node-category ((node org-roam-node))
+  (let ((properties
+         (caar (org-roam-db-query
+                [:select [nodes:properties]
+                 :from nodes
+                 :where (= id $s1)]
+                (org-roam-node-id node)))))
+    (concat "[" (alist-get "CATEGORY" properties nil nil #'equal) "]")))
+
 (after! org-roam
   (setq org-roam-directory org-directory)
-  (setq org-roam-node-display-template "${title:*} ${tags:10}")
+  (setq org-roam-node-display-template "${category:10} ${title:*} ${tags:10}")
 
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :target
