@@ -58,3 +58,4 @@
 (package! persistent-scratch)
 (package! pinentry)
 (package! nyan-mode)
+(package! vertico-posframe)

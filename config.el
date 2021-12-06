@@ -736,3 +736,11 @@ The optional argument NEW-WINDOW is not used."
   (setq display-time-load-average-threshold 0)
   (setq display-time-interval 1)
   (display-time-mode))
+
+(use-package vertico-posframe
+  :after vertico
+  :config
+  (setq vertico-posframe-parameters
+        '((left-fringe . 8)
+          (right-fringe . 8)))
+  (vertico-posframe-mode 1))
