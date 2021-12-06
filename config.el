@@ -89,11 +89,22 @@
 ;; they are implemented.
 (use-package! el-patch)
 
+(defun phr/wsl-convert-path (path)
+  (if (string-prefix-p "/mnt/" path)
+      (let* ((path (replace-regexp-in-string
+                    "/mnt/[a-z]/"
+                    (lambda (substr)
+                      (concat (upcase (substring substr 5 6)) ":/"))
+                    path))
+             (path (replace-regexp-in-string "/" "\\\\" path)))
+        path)
+    path))
+
 (defun phr/wsl-call-process (command &rest parameters)
   (call-process "/mnt/c/Users/Pedro Romano/CLionProjects/fork/cmake-build-debug/fork.exe"
                 nil nil nil
-                command
-                (string-join parameters " ")))
+                (phr/wsl-convert-path command)
+                (string-join (mapcar #'phr/wsl-convert-path parameters) " ")))
 
 (setq playnite-program "C:\\Users\\Pedro Romano\\AppData\\Local\\Playnite\\Playnite.DesktopApp.exe")
 
@@ -766,3 +777,9 @@ The optional argument NEW-WINDOW is not used."
 (use-package! epkg
   :config
   (setq epkg-repository (expand-file-name "epkg" doom-etc-dir)))
+
+(use-package! ahk-mode
+  :config
+  (defun ahk-run-script ()
+    (interactive)
+    (phr/wsl-call-process (buffer-file-name))))

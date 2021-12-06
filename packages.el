@@ -60,3 +60,4 @@
 (package! nyan-mode)
 (package! vertico-posframe)
 (package! epkg)
+(package! ahk-mode)
