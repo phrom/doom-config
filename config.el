@@ -90,15 +90,17 @@
 (use-package! el-patch)
 
 (defun phr/wsl-convert-path (path)
-  (if (string-prefix-p "/mnt/" path)
+  (cond
+   ((string-match-p "^[A-Z]:\\\\" path) path)
+   ((string-prefix-p "/mnt/" path)
       (let* ((path (replace-regexp-in-string
                     "/mnt/[a-z]/"
                     (lambda (substr)
                       (concat (upcase (substring substr 5 6)) ":/"))
                     path))
              (path (replace-regexp-in-string "/" "\\\\" path)))
-        path)
-    path))
+        path))
+   (t (concat "\\\\wsl$\\Debian" (replace-regexp-in-string "/" "\\\\" path)))))
 
 (defun phr/wsl-call-process (command &rest parameters)
   (call-process "/mnt/c/Users/Pedro Romano/CLionProjects/fork/cmake-build-debug/fork.exe"
