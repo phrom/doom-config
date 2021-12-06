@@ -100,6 +100,9 @@
 (defun phr/playnite-start (id)
   (phr/wsl-call-process playnite-program "--start" id))
 
+(defun phr/steam-start (id)
+  (phr/wsl-call-process (format "steam://run/%s/" id)))
+
 (setq vlc-program "C:\\Program Files\\VideoLAN\\VLC\\vlc.exe")
 
 (defun phr/vlc-open-file (filename)
@@ -162,7 +165,8 @@
 (after! ol
   (org-link-set-parameters "playnite" :follow #'phr/playnite-start)
   (org-link-set-parameters "exe" :follow #'phr/wsl-call-process)
-  (org-link-set-parameters "vlc" :follow #'phr/vlc-open-file))
+  (org-link-set-parameters "vlc" :follow #'phr/vlc-open-file)
+  (org-link-set-parameters "steam" :follow #'phr/steam-start))
 
 (after! org-roam
   (setq org-roam-directory org-directory)
@@ -439,7 +443,7 @@ to t."
   (advice-add 'elfeed-previous-line :after #'phr/recenter)
   (advice-add 'elfeed-search-untag-all-unread :after #'phr/recenter)
 
-  (defun phr/elfeed-save-after-update (_url)
+  (defun phr/elfeed-save-after-update (&rest _)
     (elfeed-db-save-safe))
 
   (add-hook 'elfeed-update-hooks #'phr/elfeed-save-after-update)
@@ -498,6 +502,8 @@ to t."
 
   (evil-define-key 'normal elfeed-search-mode-map (kbd "S") 'phr/elfeed-filter-set-filter)
   (evil-define-key 'normal elfeed-search-mode-map (kbd "n") 'phr/elfeed-filter-next)
+
+  (advice-add 'phr/elfeed-filter-set-filter :after #'phr/elfeed-save-after-update)
 
   (defun phr/elfeed-with-eww-readable ()
     (interactive)
