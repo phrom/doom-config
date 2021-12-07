@@ -39,6 +39,14 @@
     (org-sort-entries nil ?p)
     (org-sort-entries nil ?o))
 
+  (defun phr/org-save-all-and-kill-buffers ()
+    (interactive)
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (eq major-mode 'org-mode)
+          (save-buffer)
+          (kill-buffer)))))
+
   (defun phr/org-autosave ()
     (run-at-time nil 60 #'org-save-all-org-buffers))
 
