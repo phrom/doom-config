@@ -91,7 +91,7 @@
 
 (defun phr/wsl-convert-path (path)
   (cond
-   ((string-match-p "^[A-Z]:\\\\" path) path)
+   ((not path) path)
    ((string-prefix-p "/mnt/" path)
       (let* ((path (replace-regexp-in-string
                     "/mnt/[a-z]/"
@@ -100,7 +100,8 @@
                     path))
              (path (replace-regexp-in-string "/" "\\\\" path)))
         path))
-   (t (concat "\\\\wsl$\\Debian" (replace-regexp-in-string "/" "\\\\" path)))))
+   ((file-exists-p path) (concat "\\\\wsl$\\Debian" (replace-regexp-in-string "/" "\\\\" path)))
+   (t path)))
 
 (defun phr/wsl-call-process (command &rest parameters)
   (call-process "/mnt/c/Users/Pedro Romano/CLionProjects/fork/cmake-build-debug/fork.exe"
@@ -780,6 +781,9 @@ The optional argument NEW-WINDOW is not used."
        :desc "Update a single feed" "U" #'elfeed-update-feed
        :desc "Save database" "s" #'phr/elfeed-save-after-update
        :desc "Compact database" "c" #'elfeed-db-compact))
+
+(map! :leader
+      :desc "M-x" "x" #'execute-extended-command)
 
 (use-package! epkg
   :config
