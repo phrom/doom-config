@@ -61,3 +61,5 @@
 (package! vertico-posframe)
 (package! epkg)
 (package! ahk-mode)
+(package! nov)
+(package! org2blog)
