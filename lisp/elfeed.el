@@ -19,8 +19,9 @@
 
   (add-hook 'elfeed-update-hooks #'phr/elfeed-save-after-update)
 
-  (defvar phr/elfeed-feeds-to-update)
-  (defvar phr/elfeed-max-concurrent-updates 1)
+  (defvar phr/elfeed-feeds-to-update nil)
+  (defvar phr/elfeed-max-concurrent-updates 16)
+  (defvar phr/elfeed-update-finished-hooks nil)
 
   (defun phr/elfeed-update ()
     (interactive)
@@ -31,8 +32,9 @@
 
   (defun phr/elfeed-update-helper (_url)
     (if phr/elfeed-feeds-to-update
-      (elfeed-update-feed (pop phr/elfeed-feeds-to-update))
-      (remove-hook 'elfeed-update-hooks #'phr/elfeed-update-helper)))
+        (elfeed-update-feed (pop phr/elfeed-feeds-to-update))
+      (remove-hook 'elfeed-update-hooks #'phr/elfeed-update-helper)
+      (run-hooks phr/elfeed-update-finished-hooks)))
 
   (defvar phr/elfeed-filters
     '((always "+unread +always")
@@ -157,10 +159,10 @@
 
   (setq elfeed-search-sort-function #'phr/elfeed-sort)
 
-  (defun phr/elfeed-score-save-after-update (_url)
-    (elfeed-score-serde-write-score-file elfeed-score-serde-score-file))
+  (defun phr/elfeed-score-save-after-update (&rest _url)
+    (elfeed-score-rule-stats-write elfeed-score-rule-stats-file))
 
-  (add-hook 'elfeed-update-hooks #'phr/elfeed-score-save-after-update))
+  (add-hook 'phr/elfeed-update-finished-hooks #'phr/elfeed-score-save-after-update))
 
 (map! :leader
       (:prefix ("e" . "elfeed")
