@@ -80,7 +80,7 @@
   (cl-defmethod org-roam-node-category ((node org-roam-node))
     (format "[%s]" (alist-get "CATEGORY" (org-roam-node-properties node) nil nil #'equal)))
 
-  (setq org-roam-node-display-template "${category:16} ${olp} > ${title:*} ${tags:10}")
+  (setq org-roam-node-display-template "${category:16} ${olp} > ${title:*}")
 
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :target
