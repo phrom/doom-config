@@ -63,3 +63,4 @@
 (package! ahk-mode)
 (package! nov)
 (package! org2blog)
+(package! powershell)
