@@ -174,7 +174,7 @@
           (search category-keep alpha-up)))
 
   (setq org-agenda-prefix-format
-        '((agenda . " %i %-20:(phr/org-show-breadcrumbs 16)%?-12t %s")
+        '((agenda . " %i %-30:(phr/org-show-breadcrumbs 26)%?-12t %s")
           (todo . " %i %-16:c %-34:(phr/org-show-breadcrumbs 30)")
           (tags . " %i %-16:c")
           (search . " %i %-16:c")))
