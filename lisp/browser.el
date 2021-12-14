@@ -18,7 +18,14 @@ The optional argument NEW-WINDOW is not used."
      (replace-regexp-in-string "nyaa.si/download/\\([0-9]+\\).torrent" "nyaa.si/view/\\1" url)
      new-window))
 
-  (add-to-list 'browse-url-handlers '("nyaa.si" . phr/browse-url-nyaa)))
+  (add-to-list 'browse-url-handlers '("nyaa.si" . phr/browse-url-nyaa))
+
+  (defun phr/browse-url-bibliogram (url &optional new-window)
+    (browse-url-msedge
+     (string-replace "bibliogram.snopyta.org" "bibliogram.art" url)
+     new-window))
+
+  (add-to-list 'browse-url-handlers '("bibliogram.snopyta.org" . phr/browse-url-bibliogram)))
 
 (use-package! eww
   :config
