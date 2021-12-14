@@ -32,7 +32,7 @@
           (other-window 1)
           (throw 'intentionally-unhandled "This is fine!")))))
 
-  (add-hook 'dired-after-readin-hook 'phr/dired-hook-auto-open-on-image-dired)
+;  (add-hook 'dired-after-readin-hook 'phr/dired-hook-auto-open-on-image-dired)
 
   (setq image-dired-cmd-create-temp-image-options '("-size" "%wx%h" "%f[0]" "-resize" "%wx%h" "-strip" "jpeg:%t")))
 
