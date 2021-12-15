@@ -39,6 +39,11 @@
     (org-sort-entries nil ?p)
     (org-sort-entries nil ?o))
 
+  (defun phr/org-link-parse (link)
+    (string-match "\\[\\[\\(.*\\)]\\[\\(.*\\)\\]\\]" link)
+    (cons (match-string 1 link)
+          (match-string 2 link)))
+
   (defun phr/org-save-all-and-kill-buffers ()
     (interactive)
     (dolist (buffer (buffer-list))
