@@ -137,6 +137,14 @@
     (when tags
       (insert "(" tags-str ")")))))
 
+(after! elfeed-org
+  (defun phr/elfeed-org-add-ids ()
+    (interactive)
+    (org-map-entries
+     (lambda ()
+       (when-let ((parse-link (phr/org-link-parse (org-entry-get (point) "ITEM"))))
+         (org-set-property "ID" (car parse-link)))))))
+
 (use-package! elfeed-score
   :after elfeed
 
