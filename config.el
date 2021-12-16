@@ -104,4 +104,4 @@
 (use-package! playnite)
 (use-package! vndb
   :config
-  (setq vndb-tags-json-location (file-name-concat doom-local-dir "vndb" "vndb-tags-2021-12-16.json.gz")))
+  (setq vndb-tags-json-location (file-name-concat doom-etc-dir "vndb" "vndb-tags-2021-12-16.json.gz")))
