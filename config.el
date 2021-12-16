@@ -88,3 +88,20 @@
 
 (advice-add 'image-dired-create-thumb-1 :filter-args #'phr/image-dired-create-thumb-for-org-file)
 
+(defun phr/add-to-load-path (root)
+  (when (file-exists-p root)
+    (dolist (p (directory-files root))
+      (let ((f (expand-file-name p root)))
+        (when (and (file-directory-p f)
+                   (not (member p '("." ".."))))
+          (add-to-list 'load-path f))))))
+
+(phr/add-to-load-path "~/git/private/emacs-lisp")
+(phr/add-to-load-path "~/git/public/emacs-lisp")
+
+(use-package! hltb)
+(use-package! hltb-org)
+(use-package! playnite)
+(use-package! vndb
+  :config
+  (setq vndb-tags-json-location (file-name-concat doom-local-dir "vndb" "vndb-tags-2021-12-16.json.gz")))
